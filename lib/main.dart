@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizzler/quiz_brain.dart';
 
 void main() => runApp(const Quizzler());
 
@@ -22,7 +23,7 @@ class Quizzler extends StatelessWidget {
           ),
           child: const SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16),
               child: QuizPage(),
             ),
           ),
@@ -40,19 +41,24 @@ class QuizPage extends StatefulWidget {
 }
 
 class QuizPageState extends State<QuizPage> {
+  QuizBrain quizBrain = QuizBrain();
+
+  List<Icon> scoreKeeper = [];
+
+  int qNum = 0;
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const Expanded(
+        Expanded(
           flex: 6,
           child: Center(
             child: Text(
-              'This is where the question text will go.',
+              quizBrain.getQuestionText(),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 25.0,
                 color: Colors.white,
               ),
@@ -77,6 +83,26 @@ class QuizPageState extends State<QuizPage> {
                   ),
                   onPressed: () {
                     //The user picked true.
+                    bool correctAnswer = quizBrain.getQuestionAnswer();
+
+                    quizBrain.nextQuestion();
+
+                    if (correctAnswer) {
+                      print('correct! ...');
+                      scoreKeeper.add(
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                      );
+                    } else {
+                      print('wrong! ..');
+                      scoreKeeper.add(Icon(
+                        Icons.close,
+                        color: Colors.red,
+                      ));
+                    }
+                    setState(() {});
                   },
                 ),
               ),
@@ -101,7 +127,9 @@ class QuizPageState extends State<QuizPage> {
             ],
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        Row(
+          children: scoreKeeper,
+        )
       ],
     );
   }
