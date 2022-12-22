@@ -16,7 +16,7 @@ class Quizzler extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Colors.deepPurple.shade900,
-                Colors.black,
+                Colors.amber,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -43,16 +43,37 @@ class QuizPage extends StatefulWidget {
 
 class QuizPageState extends State<QuizPage> {
   QuizBrain quizBrain = QuizBrain();
-
   List<Icon> scoreKeeper = [];
+
+  bool isEnabled = true;
 
   void checkAnswer(bool userAnswer) async {
     bool correctAnswer = quizBrain.getQuestionAnswer();
+    quizBrain.nextQuestion();
+
+    setState(() {
+      if (userAnswer == correctAnswer) {
+        print('correct! ...');
+        scoreKeeper.add(
+          Icon(
+            Icons.check,
+            color: Colors.green,
+          ),
+        );
+      } else {
+        print('wrong! ..');
+        scoreKeeper.add(Icon(
+          Icons.close,
+          color: Colors.red,
+        ));
+      }
+    });
 
     if (quizBrain.isFinished()) {
+      isEnabled = false;
       quizBrain.reset();
 
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: 500));
 
       Alert(
         context: context,
@@ -73,25 +94,6 @@ class QuizPageState extends State<QuizPage> {
 
       setState(() {
         scoreKeeper = [];
-      });
-    } else {
-      setState(() {
-        if (userAnswer == correctAnswer) {
-          print('correct! ...');
-          scoreKeeper.add(
-            Icon(
-              Icons.check,
-              color: Colors.green,
-            ),
-          );
-        } else {
-          print('wrong! ..');
-          scoreKeeper.add(Icon(
-            Icons.close,
-            color: Colors.red,
-          ));
-        }
-        quizBrain.nextQuestion();
       });
     }
   }
@@ -131,10 +133,12 @@ class QuizPageState extends State<QuizPage> {
                       fontSize: 20.0,
                     ),
                   ),
-                  onPressed: () {
-                    //The user picked true.
-                    checkAnswer(true);
-                  },
+                  onPressed: isEnabled
+                      ? () {
+                          //The user picked true.
+                          checkAnswer(true);
+                        }
+                      : null,
                 ),
               ),
               const SizedBox(
@@ -150,10 +154,12 @@ class QuizPageState extends State<QuizPage> {
                       color: Colors.white,
                     ),
                   ),
-                  onPressed: () {
-                    //The user picked false.
-                    checkAnswer(false);
-                  },
+                  onPressed: isEnabled
+                      ? () {
+                          //The user picked true.
+                          checkAnswer(false);
+                        }
+                      : null,
                 ),
               ),
             ],

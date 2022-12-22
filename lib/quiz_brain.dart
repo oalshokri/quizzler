@@ -10,8 +10,9 @@ class QuizBrain {
   ];
 
   void nextQuestion() {
-    if (_qNum < _questions.length - 1) {
+    if (_qNum <= _questions.length - 1) {
       _qNum++;
+      print(_qNum);
     }
   }
 
@@ -24,7 +25,7 @@ class QuizBrain {
   }
 
   bool isFinished() {
-    if (_qNum >= _questions.length - 1) {
+    if (_qNum > _questions.length - 1) {
       print('no more');
       return true;
     } else {
