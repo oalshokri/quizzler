@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() => runApp(const Quizzler());
 
@@ -45,7 +46,56 @@ class QuizPageState extends State<QuizPage> {
 
   List<Icon> scoreKeeper = [];
 
-  int qNum = 0;
+  void checkAnswer(bool userAnswer) async {
+    bool correctAnswer = quizBrain.getQuestionAnswer();
+
+    if (quizBrain.isFinished()) {
+      quizBrain.reset();
+
+      await Future.delayed(Duration(milliseconds: 1000));
+
+      Alert(
+        context: context,
+        type: AlertType.success,
+        title: "Congratulation",
+        desc: "Flutter is more awesome with RFlutter Alert.",
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Try Again",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            width: 120,
+          )
+        ],
+      ).show();
+
+      setState(() {
+        scoreKeeper = [];
+      });
+    } else {
+      setState(() {
+        if (userAnswer == correctAnswer) {
+          print('correct! ...');
+          scoreKeeper.add(
+            Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          );
+        } else {
+          print('wrong! ..');
+          scoreKeeper.add(Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+        quizBrain.nextQuestion();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -83,26 +133,7 @@ class QuizPageState extends State<QuizPage> {
                   ),
                   onPressed: () {
                     //The user picked true.
-                    bool correctAnswer = quizBrain.getQuestionAnswer();
-
-                    quizBrain.nextQuestion();
-
-                    if (correctAnswer) {
-                      print('correct! ...');
-                      scoreKeeper.add(
-                        Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        ),
-                      );
-                    } else {
-                      print('wrong! ..');
-                      scoreKeeper.add(Icon(
-                        Icons.close,
-                        color: Colors.red,
-                      ));
-                    }
-                    setState(() {});
+                    checkAnswer(true);
                   },
                 ),
               ),
@@ -121,6 +152,7 @@ class QuizPageState extends State<QuizPage> {
                   ),
                   onPressed: () {
                     //The user picked false.
+                    checkAnswer(false);
                   },
                 ),
               ),
